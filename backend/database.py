@@ -1,8 +1,11 @@
-from sqlalchemy import create_engine
 import os
+from sqlalchemy import create_engine
 
-DATABASE_URL = os.getenv("postgresql://zoo_db_4zo0_user:mPBvdLFNoUYYEBKUG9KjEfId1zjOlQZH@dpg-d7a6ed7pm1nc73bus3kg-a.oregon-postgres.render.com/zoo_db_4zo0")
+# Use Render's environment variable, fallback for local dev
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost:5432/zoo_db")
 
-DATABASE_URL = "postgresql://postgres:1234@localhost:5432/zoo_db"
+# Fix for Render: sqlalchemy needs 'postgresql://' instead of 'postgres://'
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(DATABASE_URL)

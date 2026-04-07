@@ -4,7 +4,8 @@ from database import engine
 import os
 
 # Use the absolute path if needed, or relative to the project root
-csv_path = r"c:\Users\naray\OneDrive\Desktop\zoo-analytics anti\data\Preprocessed Animal Zoo Inventory.csv"
+# Path relative to project root
+csv_path = os.path.join(os.path.dirname(__file__), "..", "data", "Preprocessed Animal Zoo Inventory.csv")
 
 if not os.path.exists(csv_path):
     # Fallback to current directory for local execution
