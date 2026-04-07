@@ -16,12 +16,12 @@ services:
       - key: ALGORITHM
         value: HS256
 
-  # Frontend Static Site
-  - type: static_site
+  # Frontend Static Site (using web + runtime: static for maximum compatibility)
+  - type: web
     name: zoo-analytics-frontend
-    env: node
+    runtime: static
     buildCommand: npm install && npm run build
-    publishPath: build
+    staticPublishPath: ./build
     rootContext: frontend
     envVars:
       - key: REACT_APP_API_URL
