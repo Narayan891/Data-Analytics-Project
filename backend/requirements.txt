@@ -7,3 +7,5 @@ python-dotenv
 pandas
 pyjwt
 pydantic
+scikit-learn
+numpy
