@@ -7,7 +7,11 @@ from database import engine
 # LOAD DATA
 # ==============================
 def load_data():
-    df = pd.read_sql("SELECT * FROM zoo_data", engine)
+    try:
+        df = pd.read_sql("SELECT * FROM zoo_data", engine)
+    except Exception as e:
+        print(f"⚠️ Database not ready or table missing: {e}")
+        return pd.DataFrame()
 
     # Normalize columns: strip, replace spaces/dashes with underscores, lower
     df.columns = (
@@ -46,7 +50,11 @@ def train_model():
     return model
 
 
-model = train_model()
+try:
+    model = train_model()
+except Exception as e:
+    print(f"⚠️ Model training failed on startup (likely empty DB): {e}")
+    model = None
 
 
 # ==============================
