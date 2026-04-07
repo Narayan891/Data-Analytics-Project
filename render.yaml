@@ -17,11 +17,10 @@ services:
         value: HS256
 
   # Frontend Static Site
-  - type: web
+  - type: static
     name: zoo-analytics-frontend
-    env: static
     buildCommand: npm install && npm run build
-    staticPublishPath: ./build
+    staticPublishPath: build
     rootDir: frontend
     envVars:
       - key: REACT_APP_API_URL
