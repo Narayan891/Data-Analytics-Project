@@ -16,10 +16,10 @@ services:
       - key: ALGORITHM
         value: HS256
 
-  # Frontend Static Site (using web + runtime: static for maximum compatibility)
+  # Frontend Static Site
   - type: web
     name: zoo-analytics-frontend
-    runtime: static
+    env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
     rootDir: frontend
