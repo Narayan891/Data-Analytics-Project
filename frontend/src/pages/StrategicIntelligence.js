@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getStrategicInsights, getEndangered } from '../api/api';
+import { getStrategicInsights } from '../api/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldAlert, 
@@ -14,16 +14,9 @@ import {
 } from 'lucide-react';
 import ReportGenerator from '../components/ReportGenerator';
 
-// ==========================================
-// TABLEAU CONFIGURATION 
-// Paste your Tableau Dashboard or Story URL here:
-// TABLEAU CONFIGURATION - ENSURE THESE POINT TO PRODUCTION ANALYTICS
 const TABLEAU_STORY_1 = "https://public.tableau.com/views/Storypoint_17752762862250/Story1"; 
 const TABLEAU_STORY_2 = "https://public.tableau.com/views/Storypoint_17752762862250/Story2"; 
 
-// ==========================================
-
-// Tableau Viz Wrapper (Using Native Tableau Web Component)
 const TableauViz = ({ src }) => {
   useEffect(() => {
     if (!document.getElementById("tableau-js-api")) {
@@ -35,7 +28,6 @@ const TableauViz = ({ src }) => {
     }
   }, []);
 
-  // Strip query parameters from src to let Tableau's API handle them naturally
   const cleanSrc = src.split('?')[0];
 
   return (
@@ -61,7 +53,6 @@ const TableauViz = ({ src }) => {
 
 const StrategicIntelligence = () => {
   const [data, setData] = useState(null);
-  const [endangeredCount, setEndangeredCount] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [activeTableau, setActiveTableau] = useState(1);
 
@@ -75,9 +66,6 @@ const StrategicIntelligence = () => {
           national_averages: { mortality: 0, birth: 0 } 
         });
       });
-    getEndangered()
-      .then(res => setEndangeredCount(res.data?.length || 0))
-      .catch(err => console.error("Endangered Stats Load Fail:", err));
   }, []);
 
   if (!data) return <div className="loader-container"><div className="loader"></div></div>;
@@ -145,7 +133,6 @@ const StrategicIntelligence = () => {
         </p>
       </header>
 
-      {/* 5 ACTIONABLE PILLARS GRID */}
       <div className="insights-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '25px', marginBottom: '60px' }}>
         {insights.map((item, idx) => (
           <motion.div 
@@ -177,7 +164,6 @@ const StrategicIntelligence = () => {
                 </div>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: '700', fontFamily: 'Outfit' }}>{item.title}</h3>
               </div>
-
             </div>
             <p style={{ fontSize: '0.95rem', color: '#ecfdf5', opacity: 0.9, lineHeight: '1.5', marginBottom: '24px', position: 'relative', zIndex: 1, fontWeight: 500 }}>
               {item.desc}
@@ -194,7 +180,6 @@ const StrategicIntelligence = () => {
         ))}
       </div>
 
-      {/* DRILL-DOWN SECTION */}
       <AnimatePresence mode="wait">
         <motion.div 
           key={activeTab}
@@ -228,7 +213,6 @@ const StrategicIntelligence = () => {
               </p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-
               <ReportGenerator 
                 targetId={`drill-down-${activeTab}`} 
                 projectName={`Tactical_Audit_${insights[activeTab].title.replace(/\s+/g, '_')}`} 
@@ -273,7 +257,6 @@ const StrategicIntelligence = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* TABLEAU STRATEGIC PORTAL - THE BI COMMAND CENTER */}
       <section className="tableau-portal" style={{ 
         marginTop: '80px', 
         padding: '50px', 
@@ -329,8 +312,6 @@ const StrategicIntelligence = () => {
              ) : (
                <TableauViz src={activeTableau === 1 ? TABLEAU_STORY_1 : TABLEAU_STORY_2} />
              )}
-
-
           </div>
          
          <div className="portal-footer" style={{ 

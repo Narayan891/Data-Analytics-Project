@@ -5,10 +5,10 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   PieChart, Pie, Cell, Legend
 } from "recharts";
-import { AlertCircle, AlertOctagon, ShieldCheck, MapPin, HeartPulse, Activity } from "lucide-react";
+import { AlertOctagon, ShieldCheck, MapPin, HeartPulse, Activity } from "lucide-react";
 
 // --- Custom Tooltip for Area Chart ---
-const CustomAreaTooltip = ({ active, payload, label }) => {
+const CustomAreaTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isCritical = data.mortalityRate > 10;
@@ -125,7 +125,6 @@ function Mortality() {
         </p>
       </header>
         
-      {/* EXECUTIVE TACTICAL SELECTOR */}
       <div className="tactical-selector-container" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', marginBottom: '40px' }}>
         <MapPin size={20} color="#ef4444" />
         <select 
@@ -200,7 +199,6 @@ function Mortality() {
         </motion.div>
       </div>
 
-      {/* STRATEGIC VETERINARY PROTOCOL */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -339,7 +337,7 @@ function Mortality() {
                 </div>
                 <span style={{ display: 'block', fontWeight: '800', color: '#fff', fontSize: '1.2rem', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>{d.fullName}</span>
                 <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)', display: 'block', marginBottom: '12px', fontFamily: 'var(--font-body)', fontWeight: 600 }}>
-                  {selectedRegion === "All Regions" ? "National Jurisdiction" : "Regional Facility"}
+                   Regional Facility
                 </span>
                 <div style={{ color: d.mortalityRate < 5 ? '#22c55e' : '#fbbf24', fontWeight: '900', fontSize: '1.1rem', letterSpacing: '-0.5px' }}>
                   {d.mortalityRate}% Risk

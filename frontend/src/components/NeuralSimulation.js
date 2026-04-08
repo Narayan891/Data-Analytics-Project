@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Zap, Play, RotateCcw, TrendingUp, TrendingDown, Biohazard } from 'lucide-react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar
 } from 'recharts';
 import './NeuralSimulation.css';
 

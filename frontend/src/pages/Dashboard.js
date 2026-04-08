@@ -2,13 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { getStateRisk, runPrediction } from "../api/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine, LabelList
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LabelList
 } from "recharts";
 import { AlertTriangle, TrendingUp, ShieldCheck, Activity, GripHorizontal } from "lucide-react";
-
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
-import { Download } from "lucide-react";
 
 // NEW: Drag and drop modularity
 import { Responsive as ResponsiveGridLayout, useContainerWidth } from 'react-grid-layout';
@@ -70,18 +66,9 @@ const CustomDashboardTooltip = ({ active, payload }) => {
 function Dashboard() {
   const [data, setData] = useState([]);
   const [selected, setSelected] = useState("");
-  const [filteredStates, setFilteredStates] = useState([]); // Tactical Filter state
+  const [filteredStates] = useState([]); 
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState(false);
-
-  const toggleStateFilter = (stateName) => {
-    setFilteredStates(prev => 
-      prev.includes(stateName) 
-        ? prev.filter(s => s !== stateName) 
-        : [...prev, stateName]
-    );
-  };
 
   const handlePredict = useCallback(async (stateName) => {
     const targetState = stateName || selected;
@@ -105,7 +92,6 @@ function Dashboard() {
     setLoading(false);
   }, [data, selected]);
 
-  // Auto-trigger prediction when selection changes via Map or Dropdown
   useEffect(() => {
     if (selected) {
       handlePredict(selected);
@@ -140,30 +126,23 @@ function Dashboard() {
 
   const topRisk = [...data].sort((a, b) => (b.mortality_rate || 0) - (a.mortality_rate || 0)).filter(d => d.predicted_risk === 1).slice(0, 4);
   
-  // Tactical Data Logic: Prioritize filtered states, else show top 10
   const displayData = filteredStates.length > 0 
     ? data.filter(d => filteredStates.includes(d.state))
     : [...data].sort((a, b) => (b.mortality_rate || 0) - (a.mortality_rate || 0)).slice(0, 10);
 
   const chartData = displayData.sort((a, b) => (b.mortality_rate || 0) - (a.mortality_rate || 0));
 
-  // Dynamic Color Science: Heatmap mapping
-  // Unified Premium Color Science: Synchronized with Choropleth Legend
   const getBarColor = (rate) => {
-    if (rate > 0.75) return 'url(#barGradCritical)'; // Severe
-    if (rate > 0.60) return 'url(#barGradHigh)';     // High
-    if (rate > 0.45) return 'url(#barGradMedium)';   // Elevated
-    if (rate > 0.30) return 'url(#barGradWarning)';  // Low Alert
-    return 'url(#barGradSafe)';                      // Stable
+    if (rate > 0.75) return 'url(#barGradCritical)';
+    if (rate > 0.60) return 'url(#barGradHigh)';
+    if (rate > 0.45) return 'url(#barGradMedium)';
+    if (rate > 0.30) return 'url(#barGradWarning)';
+    return 'url(#barGradSafe)';
   };
 
-  // Industry Standard Enterprise Grid Layout Algorithm
   const defaultLayout = [
-    // ROW 1: Optimized High-Fidelity Shelf
     { i: "map", x: 0, y: 0, w: 6, h: 6 },
     { i: "chart", x: 6, y: 0, w: 6, h: 6 },
-    
-    // ROW 2: Tactical Intelligence
     { i: "predict", x: 0, y: 6, w: 6, h: 6 },
     { i: "alerts", x: 6, y: 6, w: 6, h: 6 }
   ];
@@ -206,7 +185,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* TACTICAL SELECTOR DROPDOWN */}
       <div className="tactical-selector-container">
         <Activity size={20} color="var(--primary)" />
         <select 
@@ -249,7 +227,6 @@ function Dashboard() {
           )}
         </AnimatePresence>
         
-        {/* KPI GRID (Bionic Botanical Spotlight) */}
         <div className="kpi-grid" style={{ marginBottom: '32px' }}>
           {[
             { title: "Total Covered States", value: totalStates, icon: <Activity size={20} />, sub: "Active Jurisdictions", type: "main" },
@@ -298,7 +275,6 @@ function Dashboard() {
           isBounded={false}
           margin={[20, 20]}
         >
-          {/* GEOGRAPHICAL MAP */}
           <div key="map" className="card large premium-bloom" style={{ display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: '800' }}>
               <GripHorizontal className="drag-handle" size={24} style={{ marginRight: '16px', opacity: 0.4, cursor: 'grab' }} />
@@ -309,7 +285,6 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* MAIN CHART CONTAINTER */}
           <div key="chart" className="card large premium-bloom" style={{ display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
               <GripHorizontal className="drag-handle" size={18} style={{ marginRight: '10px', opacity: 0.4, cursor: 'grab' }} />
@@ -368,9 +343,6 @@ function Dashboard() {
                     dataKey="mortality_rate" 
                     radius={[6, 6, 0, 0]} 
                     barSize={40}
-                    isAnimationActive={true}
-                    animationDuration={1500}
-                    animationEasing="cubic-bezier(0.16, 1, 0.3, 1)"
                   >
                     {chartData.map((entry, index) => (
                       <Cell 
@@ -392,7 +364,6 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* AI HABITAT ASSESSMENT & TELEMETRY */}
           <div key="predict" className="card" style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -443,7 +414,6 @@ function Dashboard() {
                     <strong>{prediction.risk ? "CITICAL ALERT" : "SYSTEM STABLE"}</strong>
                   </div>
                   
-                  {/* Confidence Explanation */}
                   <div style={{ fontSize: '11px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px', marginBottom: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '4px' }}>
                        <Activity size={12} />
@@ -454,7 +424,6 @@ function Dashboard() {
                     </span>
                   </div>
 
-                  {/* Strategic Protocol (Overcoming the situation) */}
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px' }}>
                     <strong style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.8, display: 'block', marginBottom: '5px' }}>
                       Recommended Strategic Protocol:
@@ -477,7 +446,6 @@ function Dashboard() {
             </AnimatePresence>
           </div>
 
-          {/* PRIORITY ACTION ITEMS */}
           <div key="alerts" className="card" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
               <GripHorizontal className="drag-handle" size={18} style={{ marginRight: '10px', opacity: 0.4, cursor: 'grab' }} />

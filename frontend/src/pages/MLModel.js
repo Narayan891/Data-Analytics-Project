@@ -2,10 +2,10 @@ import React, { useEffect, useState, useMemo } from "react";
 import { getPredictions, getMLStats } from "../api/api";
 import { motion } from "framer-motion";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   BarChart, Bar, Cell
 } from "recharts";
-import { BrainCircuit, ActivitySquare, Target, Zap, Filter, Microscope } from "lucide-react";
+import { BrainCircuit, ActivitySquare, Target, Zap, Filter } from "lucide-react";
 import NeuralSimulation from "../components/NeuralSimulation";
 
 // --- Custom Tooltip for Area Chart ---
@@ -123,34 +123,6 @@ function MLModel() {
     highestNegative = featureWeights[featureWeights.length - 1] || highestNegative;
   }
 
-  const dropdownStyle = {
-    padding: '12px 18px',
-    borderRadius: '10px',
-    border: '1px solid rgba(74, 222, 128, 0.4)',
-    background: 'rgba(20, 25, 20, 0.8)',
-    color: '#fff',
-    fontSize: '15px',
-    cursor: 'pointer',
-    outline: 'none',
-    minWidth: '250px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-    backdropFilter: 'blur(10px)',
-    transition: 'all 0.3s ease',
-    WebkitAppearance: 'none',
-    appearance: 'none',
-  };
-
-  const dropdownContainerStyle = {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-    background: 'rgba(0,0,0,0.2)',
-    padding: '15px 25px',
-    borderRadius: '12px',
-    border: '1px solid rgba(255,255,255,0.05)',
-  };
-
   return (
     <motion.div 
       className="dashboard premium-bloom"
@@ -168,7 +140,6 @@ function MLModel() {
           <p style={{ color: 'var(--text-muted)', fontSize: '20px', marginTop: '12px', fontWeight: '500', fontFamily: 'var(--font-body)' }}>Strategic Ecosystem Projections & Algorithmic Feature Weights</p>
         </div>
         
-        {/* EXECUTIVE TACTICAL SELECTOR */}
         <div className="tactical-selector-container">
           <Filter size={20} color="var(--primary)" />
           <select 
@@ -185,7 +156,17 @@ function MLModel() {
         </div>
       </div>
 
-      {/* DASHBOARD WIDGET 1: KPI GRID */}
+      {/* PROMINENT NEURAL SIMULATION SECTION (MOVED UP) */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        style={{ marginBottom: '60px' }}
+      >
+        <NeuralSimulation />
+      </motion.div>
+
       <div className="kpi-grid">
         <motion.div 
           className="kpi-card main botanical-spotlight" 
@@ -263,36 +244,7 @@ function MLModel() {
         </motion.div>
       </div>
 
-      {/* STRATEGIC MODELLING PROTOCOL */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        className="card premium-card" 
-        style={{ marginTop: '32px', padding: '40px', border: '1px solid rgba(235, 196, 116, 0.2)', background: 'rgba(235, 196, 116, 0.05)', borderRadius: '28px' }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '24px' }}>
-          <BrainCircuit size={24} color="var(--primary)" />
-          <strong style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '3px', color: 'var(--primary)', fontWeight: '900' }}>Executive Intelligence Protocol:</strong>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '32px', fontSize: '14px', color: 'var(--text-main)' }}>
-           <div style={{ display: 'flex', gap: '15px' }}>
-              <span style={{ color: 'var(--primary)', fontWeight: '900', fontSize: '18px' }}>01.</span>
-              <span style={{ opacity: 0.9, lineHeight: '1.6' }}><strong>Audit Input Variance</strong>: Manually verify <span style={{ color: '#ef4444', fontWeight: 'bold' }}>{highestNegative.feature}</span> anomalies in raw matrix.</span>
-           </div>
-           <div style={{ display: 'flex', gap: '15px' }}>
-              <span style={{ color: 'var(--primary)', fontWeight: '900', fontSize: '18px' }}>02.</span>
-              <span style={{ opacity: 0.9, lineHeight: '1.6' }}><strong>Verify Outliers</strong>: Perform isolation forest analysis on <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{selectedZoo}</span> data points.</span>
-           </div>
-           <div style={{ display: 'flex', gap: '15px' }}>
-              <span style={{ color: 'var(--primary)', fontWeight: '900', fontSize: '18px' }}>03.</span>
-              <span style={{ opacity: 0.9, lineHeight: '1.6' }}><strong>Recalibrate Weights</strong>: Re-run global training if performance score drops below 92.5%.</span>
-           </div>
-        </div>
-      </motion.div>
-
       <div className="main-grid" style={{ gridTemplateColumns: '2fr 1fr', marginTop: '30px' }}>
-        
-        {/* DASHBOARD WIDGET 2: PREDICTION GROWTH FORECAST */}
         <div className="card large" style={{ padding: '40px', background: 'var(--glass-card)', border: '1px solid var(--glass-border)', borderRadius: '32px' }}>
           <h3 style={{ marginBottom: '32px', fontFamily: 'Outfit', fontWeight: '800', fontSize: '1.8rem' }}>
             📉 Target Projections
@@ -308,13 +260,7 @@ function MLModel() {
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={380}>
-              <AreaChart data={groupedData} margin={{ top: 10, right: 30, left: 10, bottom: 60 }}>
-                <defs>
-                  <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
+              <BarChart data={groupedData} margin={{ top: 10, right: 30, left: 10, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
                 <XAxis 
                   dataKey="name" 
@@ -334,21 +280,16 @@ function MLModel() {
                   axisLine={false}
                 />
                 <Tooltip content={<CustomAreaTooltip />} cursor={{ stroke: 'var(--primary)', strokeWidth: 2, strokeDasharray: '5 5' }} />
-                <Area 
-                  type="monotone" 
+                <Bar 
                   dataKey="growth" 
-                  stroke="var(--primary)" 
-                  strokeWidth={4} 
-                  fillOpacity={1} 
-                  fill="url(#colorGrowth)" 
-                  activeDot={{ r: 10, strokeWidth: 3, fill: '#05080a', stroke: 'var(--primary)' }} 
+                  fill="var(--primary)" 
+                  radius={[4, 4, 0, 0]} 
                 />
-              </AreaChart>
+              </BarChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        {/* DASHBOARD WIDGET 3: FEATURE WEIGHTS DISTRIBUTION */}
         <div className="card" style={{ padding: '40px', background: 'var(--glass-card)', border: '1px solid var(--glass-border)', borderRadius: '32px' }}>
           <h3 style={{ marginBottom: '32px', fontFamily: 'Outfit', fontWeight: '800', fontSize: '1.8rem' }}>Algorithmic Weights</h3>
           {loading ? (
@@ -384,17 +325,6 @@ function MLModel() {
           )}
         </div>
       </div>
-
-      {/* NEURAL SIMULATION SECTION */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-        style={{ marginTop: '40px' }}
-      >
-        <NeuralSimulation />
-      </motion.div>
     </motion.div>
   );
 }

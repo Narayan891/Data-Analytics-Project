@@ -72,12 +72,15 @@ def login_user(req: LoginRequest):
 # LOAD DATA
 # ==============================
 def load_data():
-    logger.info("Loading zoo data from SQLite")
+    logger.info("Loading zoo data from Database")
     try:
         df = pd.read_sql('SELECT * FROM zoo_data', engine)
     except Exception as e:
-        logger.error(f"Failed to load data: {e}")
+        logger.error(f"Failed to load data from SQL: {e}")
         return pd.DataFrame()
+
+    if df.empty:
+        return df
 
     # Normalize columns: strip, replace spaces/dashes with underscores, lower, and merge underscores
     df.columns = (
@@ -100,6 +103,9 @@ def load_data():
 @app.get("/state-risk")
 def state_risk():
     df = load_data()
+
+    if df.empty:
+        return []
 
     # ✅ AUTO DETECT columns safely
     death_col = "total_death" if "total_death" in df.columns else "deaths"
@@ -126,6 +132,9 @@ def state_risk():
 def mortality_details():
     df = load_data()
 
+    if df.empty:
+        return []
+
     death_col = "total_death" if "total_death" in df.columns else "deaths"
     stock_col = "closing_balance_total" if "closing_balance_total" in df.columns else "closing_stock"
 
@@ -143,6 +152,9 @@ def mortality_details():
 def endangered():
     df = load_data()
     
+    if df.empty:
+        return []
+
     # Pillar 2: Conservation Priority
     # Filter for endangered species manually flagged or by low stock
     if "is_endangered" in df.columns:
@@ -159,6 +171,15 @@ def endangered():
 @app.get("/strategic-insights")
 def strategic_insights():
     df = load_data()
+
+    if df.empty:
+        return {
+            "national_averages": {"mortality": 0, "birth": 0},
+            "insights": {
+                "high_mortality": [], "conservation_priority": [], 
+                "breeding_leaders": [], "declining": [], "overall_performance": []
+            }
+        }
 
     # Column Mapping
     birth_col = "total_birth" if "total_birth" in df.columns else "births"
@@ -192,24 +213,19 @@ def strategic_insights():
     zoo_data["birth_rate"] = (zoo_data[birth_col] / (zoo_data[birth_col] + zoo_data[stock_col])).fillna(0)
     zoo_data["net_growth_index"] = (zoo_data[birth_col] + zoo_data[acq_col] - zoo_data[death_col] - zoo_data[disp_col])
     
-    # Pillar 1 & 5: Actionable Filters (Sensitivity tuned to 1.1x national avg due to high baseline)
+    # Pillar 1 & 5: Actionable Filters
     high_mortality_outliers = zoo_data[zoo_data["mortality_rate"] > (avg_mortality * 1.1)].sort_values(by="mortality_rate", ascending=False).head(5)
     breeding_leaders = zoo_data[zoo_data["birth_rate"] > avg_birth].sort_values(by="birth_rate", ascending=False).head(5)
     declining_populations = zoo_data[zoo_data["net_growth_index"] < 0].sort_values(by="net_growth_index").head(5)
 
-    # Pillar 2: Conservation Priority (Top 5 Zoos by Endangered Species Density)
-    stock_col = "closing_balance_total" if "closing_balance_total" in df.columns else "closing_stock"
-    # Fallback to low-balance species if explicit endangered flag is missing
+    # Pillar 2: Conservation Priority
     endangered_df = df[df["is_endangered"] == 1] if "is_endangered" in df.columns else df[df[stock_col] < 50]
-    
-    # If still empty (safe guard), grab anything with closing stock < 10
-    if endangered_df.empty:
-        endangered_df = df[df[stock_col] < 10]
+    if endangered_df.empty: endangered_df = df[df[stock_col] < 10]
 
     cp_agg = endangered_df.groupby(["zoo_name", "state"]).size().reset_index(name="species_count")
     conservation_priority = cp_agg.sort_values(by="species_count", ascending=False).head(5)
 
-    # Diversity + Growth - Mortality (Normalized Weighting)
+    # Performance
     max_diversity = zoo_data["species_name"].max() or 1
     zoo_data["performance_score"] = (
         (zoo_data["species_name"] / max_diversity * 40) + 
@@ -218,10 +234,7 @@ def strategic_insights():
     ).round(2)
 
     return {
-        "national_averages": {
-            "mortality": round(avg_mortality, 4),
-            "birth": round(avg_birth, 4)
-        },
+        "national_averages": {"mortality": round(avg_mortality, 4), "birth": round(avg_birth, 4)},
         "insights": {
             "high_mortality": high_mortality_outliers.to_dict(orient="records"),
             "conservation_priority": conservation_priority.to_dict(orient="records"),
@@ -238,12 +251,11 @@ def strategic_insights():
 @app.get("/performance")
 def performance():
     df = load_data()
+    if df.empty: return []
 
     death_col = "total_death" if "total_death" in df.columns else "deaths"
     stock_col = "closing_balance_total" if "closing_balance_total" in df.columns else "closing_stock"
-
     state_col = "state" if "state" in df.columns else None
-
     groupby_cols = ["zoo_name", state_col] if state_col else ["zoo_name"]
 
     data = df.groupby(groupby_cols).agg({
@@ -261,7 +273,6 @@ def performance():
 # ==============================
 # PREDICTIONS (TREND)
 # ==============================
-
 @app.get("/predictions")
 def predictions():
     return get_ml_predictions()
@@ -270,7 +281,6 @@ def predictions():
 # ==============================
 # ML STATS (RF)
 # ==============================
-
 @app.get("/ml-stats")
 def ml_stats():
     return get_ml_stats()
@@ -282,30 +292,17 @@ def ml_stats():
 @app.get("/comparative-analysis")
 def comparative_analysis():
     df = load_data()
+    if df.empty: return {"by_category": [], "by_class": []}
 
-    # Column Mapping
     death_col = "total_death" if "total_death" in df.columns else "deaths"
     stock_col = "closing_balance_total" if "closing_balance_total" in df.columns else "closing_stock"
-    
-    # Category and Class columns
     category_col = "zoo_size" if "zoo_size" in df.columns else "zoo_category"
     class_col = "species_class"
 
-    if death_col not in df.columns or stock_col not in df.columns:
-        return []
-
-    # 1. Group by Category (Size)
-    category_stats = df.groupby(category_col).agg({
-        death_col: "sum",
-        stock_col: "sum"
-    }).reset_index()
+    category_stats = df.groupby(category_col).agg({death_col: "sum", stock_col: "sum"}).reset_index()
     category_stats["mortality_rate"] = (category_stats[death_col] / (category_stats[death_col] + category_stats[stock_col]) * 100).fillna(0).round(2)
 
-    # 2. Group by Species Class
-    class_stats = df.groupby(class_col).agg({
-        death_col: "sum",
-        stock_col: "sum"
-    }).reset_index()
+    class_stats = df.groupby(class_col).agg({death_col: "sum", stock_col: "sum"}).reset_index()
     class_stats["mortality_rate"] = (class_stats[death_col] / (class_stats[death_col] + class_stats[stock_col]) * 100).fillna(0).round(2)
 
     return {
@@ -328,7 +325,6 @@ def alerts():
 def predict(data: dict = Body(...)):
     deaths = data.get("deaths", 0)
     stock = data.get("stock", 0)
-
     return predict_risk(deaths, stock)
 
 # ==============================
@@ -338,10 +334,32 @@ def predict(data: dict = Body(...)):
 def simulate(data: dict = Body(...)):
     mortality_multiplier = data.get("mortality_multiplier", 1.0)
     birth_multiplier = data.get("birth_multiplier", 1.0)
-    
     logger.info(f"Simulating impact: Mortality x{mortality_multiplier}, Birth x{birth_multiplier}")
     return simulate_impact(mortality_multiplier, birth_multiplier)
 
+# ==============================
+# SEED DATABASE (PRODUCTION)
+# ==============================
+@app.get("/init-db")
+def init_db():
+    logger.info("Manual database initialization triggered.")
+    # Import locally to avoid circular dependencies if any
+    import subprocess
+    import sys
+    
+    try:
+        # Run load_data.py as a script
+        script_path = os.path.join(os.path.dirname(__file__), "load_data.py")
+        subprocess.check_call([sys.executable, script_path])
+        
+        # Retrain model after seeding
+        from model import train_model
+        train_model()
+        
+        return {"status": "success", "message": "Database initialized and model retrained."}
+    except Exception as e:
+        logger.error(f"Seeding failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ==============================
 # HEALTH CHECK

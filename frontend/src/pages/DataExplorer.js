@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { getPredictions } from "../api/api";
 import Papa from "papaparse";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Download, Database, ChevronLeft, ChevronRight, Navigation, Activity } from "lucide-react";
+import { Search, Download, Database, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
 
 function DataExplorer() {
   const [data, setData] = useState([]);
@@ -11,7 +11,6 @@ function DataExplorer() {
   const [loading, setLoading] = useState(true);
   const [selectedRegion, setSelectedRegion] = useState("All Regions");
   
-  // Dock animation state mechanism
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const itemsPerPage = 8;
@@ -226,11 +225,9 @@ function DataExplorer() {
                     {paginated.map((item, i) => {
                       const rel = reliability(item.sampleSize);
                       const isHovered = hoveredIndex === i;
-                      const isNeighbor = hoveredIndex === i - 1 || hoveredIndex === i + 1;
-                      const scale = isHovered ? 1.03 : isNeighbor ? 1.01 : 1;
-                      const zIndex = isHovered ? 10 : isNeighbor ? 5 : 1;
-                      const background = isHovered ? 'rgba(34, 197, 94, 0.08)' : 
-                                         isNeighbor ? 'rgba(34, 197, 94, 0.02)' : 'transparent';
+                      const scale = isHovered ? 1.03 : 1;
+                      const zIndex = isHovered ? 10 : 1;
+                      const background = isHovered ? 'rgba(34, 197, 94, 0.12)' : 'transparent';
                       const shadow = isHovered ? '0 20px 60px rgba(0,0,0,0.6)' : 'none';
 
                       return (

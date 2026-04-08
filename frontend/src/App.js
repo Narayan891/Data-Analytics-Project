@@ -13,8 +13,8 @@ import CommandPalette from "./components/CommandPalette";
 import ActionCenter from "./components/ActionCenter";
 import ForestBackground from "./components/ForestBackground";
 
-import { Keyboard, LogOut, Shield, Zap, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Keyboard, LogOut } from "lucide-react";
+import { motion } from "framer-motion";
 
 import "./App.css";
 
@@ -40,7 +40,6 @@ function App() {
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if(el) {
-      // Ensure we account for the fixed nav height if necessary
       const headerOffset = 80;
       const elementPosition = el.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -59,10 +58,8 @@ function App() {
         <Login onLogin={handleLogin} />
       ) : (
         <>
-          {/* 🌲 ENHANCED WORLD-CLASS FOREST ATMOSPHERE */}
           <ForestBackground />
 
-          {/* 🔴 FLOATING NAVBAR */}
           <nav className="floating-nav">
             <div className="nav-links">
               <span onClick={() => scrollTo("dashboard")}>Ecosystem Overview</span>
@@ -74,7 +71,6 @@ function App() {
               <span onClick={() => scrollTo("explorer")}>Inventory Archive</span>
             </div>
 
-            {/* Action Center & Global Command Hint */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div className="nav-shortcut">
                 <Keyboard size={14} /> Ctrl + K
@@ -96,12 +92,9 @@ function App() {
             </div>
           </nav>
 
-          {/* 🔴 GLOBAL COMMAND PALETTE */}
           <CommandPalette scrollTo={scrollTo} />
 
-          {/* 🔴 SCROLLING SECTIONS */}
           <div className="scroll-container">
-            {/* SECTION 2: DASHBOARD */}
             <motion.section 
               id="dashboard" 
               className="snap-section content-section"
@@ -115,7 +108,6 @@ function App() {
               </div>
             </motion.section>
 
-            {/* SECTION 3: STRATEGIC INTELLIGENCE */}
             <motion.section 
               id="strategic" 
               className="snap-section content-section" 
@@ -130,7 +122,6 @@ function App() {
               </div>
             </motion.section>
 
-            {/* SECTION 4: COMPARATIVE ANALYSIS */}
             <motion.section 
               id="comparative" 
               className="snap-section content-section"
@@ -144,7 +135,6 @@ function App() {
               </div>
             </motion.section>
 
-            {/* SECTION 5: ML MODEL */}
             <motion.section 
               id="ml" 
               className="snap-section content-section"
@@ -158,7 +148,6 @@ function App() {
               </div>
             </motion.section>
 
-            {/* SECTION 6: MORTALITY */}
             <motion.section 
               id="mortality" 
               className="snap-section content-section"
@@ -172,7 +161,6 @@ function App() {
               </div>
             </motion.section>
             
-            {/* SECTION 7: CATEGORIES */}
             <motion.section 
               id="categories" 
               className="snap-section content-section"
@@ -186,7 +174,6 @@ function App() {
               </div>
             </motion.section>
 
-            {/* SECTION 8: EXPLORER */}
             <motion.section 
               id="explorer" 
               className="snap-section content-section" 
