@@ -1,0 +1,83 @@
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.4s ease;
+}
+
+.theme-toggle-track.prismatic {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e293b;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.theme-toggle-track.obsidian .theme-toggle-thumb {
+  left: 2px;
+}
+
+.theme-toggle-track.prismatic .theme-toggle-thumb {
+  left: calc(100% - 20px);
+}
+
+.theme-toggle-icons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 4px;
+  opacity: 0.5;
+}
+
+.theme-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Theme variables in :root */
+:root[data-theme='obsidian'] {
+  --bg-primary: #020617;
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  --accent-glow: rgba(56, 189, 248, 0.15);
+  --card-border: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='prismatic'] {
+  --bg-primary: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --accent-glow: rgba(99, 102, 241, 0.1);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --text-main: #1e293b;
+}
